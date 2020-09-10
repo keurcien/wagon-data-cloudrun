@@ -1,46 +1,68 @@
 # wagon-data-cloudrun
 
 This repository contains a simple boilerplate to quickly build a
-falcon API with Docker and gunicorn. It can be easily deployed on
-Cloud Run for example, provided that you own a Google Cloud Platform
-project. Now that Cloud Run instances can be configured with 4GB of RAM,
-it makes it a serious option for Deep Learning deployment.
+falcon API ready to be deployed with Cloud Run. Now that Cloud Run instances
+can be configured with 4GB of RAM, it makes it a serious option for
+Deep Learning deployment. But before you proceed:
+
+- Make sure you have a Google Cloud project set up.
+- Docker and gcloud CLI are installed on your local machine
+
+## Google Container Registry
+
+Google Container Registry is a Google service designed to host your Docker images.
+It allows other services such as Cloud Run to access these images in a convenient way.
+
+- Go to your Google Cloud project
+- Enable Google Container Registry API
+- Open a terminal and run the following commands:
+
+```shell
+gcloud auth login
+gcloud auth configure-docker
+```
+
+- Choose the Google account associated with your Google Cloud project.
+
+You should be good to go.
 
 ## Let's take a look at the app
 
 ```python
-import falcon
-import numpy as np
-import cv2
-import tensorflow as tf
-from tensorflow.keras.models import load_model
+model = VGG16(weights='imagenet')
 
-class ImageClassifier:
+app = Flask(__name__)
 
-    def __init__(self):
-        '''Falcon API entrypoint.
+@app.route('/', methods = ['GET', 'POST'])
+def index():
+
+    if request.method == 'GET':
+        return render_template('index.html', prediction=None, img=None)
+
+    if request.method == 'POST':
+
+        # Handle request
+        img = request.files['file'].read()
+
+        # A tiny bit of preprocessing
+        img = process_request_image(img)
         
-        In short, it is a regular class with specific methods such as
-        on_get or on_post.
-        '''
-        self.model = load_model("vgg16_model")
+        # Convert image to data URI so it can be displayed without being saved
+        uri = create_data_uri(img)
+        
+        # Convert to VGG16 input
+        img = cv2.resize(img, (224, 224))
+        img = np.reshape(img, [1, 224, 224, 3])
 
-    def on_get(self, req, resp):
-        img = cv2.imread('DSC01159-2.jpg')
-        img = cv2.resize(img,(224,224))
-        img = np.reshape(img,[1,224,224,3])
-        resp.media = {
-            "prediction": str(self.model.predict(img)[0])
-        }
+        # Classify image
+        predictions = model.predict(img)
+        labels = decode_predictions(predictions, top=1)
 
-# Instantiate a falcon API
-api = falcon.API()
-
-# API routing
-api.add_route('/', ImageClassifier())
+        return render_template('index.html', prediction=labels[0][0][1], img=uri)
 ```
 
-All you need is a model that you can load.
+All you need is a model that you can load. It is loaded outside of the `index` scope so it does not
+get loaded everytime a request is processed.
 
 ## requirements.txt
 
@@ -48,13 +70,18 @@ List all the dependencies needed to run your app.
 
 ## Build the Docker image
 
+```shell
+docker build -t eu.gcr.io/[project_id]/[docker_image_name] .
+docker push eu.gcr.io/[project_id]/[docker_image_name]
 ```
-docker build -t eu.gcr.io/[project_name]/[image_name] .
-docker push eu.gcr.io/[project_name]/[image_name]
+
+Make sure your image runs:
+
+```shell
+docker run -p 8080:8080 eu.gcr.io/[project_id]/[docker_image_name]
 ```
 
 ## Deploy on Cloud Run
 
 Go to your Google Cloud Platform project and open the service panel.
 Select the Cloud Run service and create a new service.
-

@@ -1,0 +1,55 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: #444;
+}
+
+.banner {
+    height: 30px;
+    background: #25a992; 
+    padding: 30px;
+    color: white; 
+    font-size: 24px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.content {
+    height: 650px;
+    padding: 30px;
+    text-align: center;
+}
+
+.input-container {
+    text-align: center;
+}
+
+.img-container > img {
+    max-height: 600px;
+    border-radius: 25px;
+}
+
+.prediction {
+    font-weight: 700;
+    text-transform: capitalize;
+}
+
+.submit-btn, .input-file-btn {
+    cursor: pointer;
+    background: white;
+    font-weight: bold;
+    color: black;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-radius: 25px;
+    border: 1px solid rgb(195, 195, 195);
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.submit-btn:hover, .input-file-btn:hover {
+    color: #25a992;
+}

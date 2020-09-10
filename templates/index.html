@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+    <div class="banner">VGG16 on Cloud Run</div>
+
+    <div class="content">
+        
+        <div class="img-container">
+        {% if img %}
+            <img src="{{ img }}"/>
+        {% endif %}
+        </div>
+        
+        {% if prediction %}
+            <p class="prediction">{{ prediction }}</p>
+        {% endif %}
+
+    </div>
+
+    <div class="input-container">
+        <form action = "/" method = "post" enctype="multipart/form-data">  
+            <label for="file" class="input-file-btn">Choisir une image</label>
+            <input style="display: none;" type="file" name="file" id="file"/>
+            <input class="submit-btn" type="submit" value="Upload">  
+        </form> 
+        <p>Sélectionnez une image depuis votre ordinateur puis cliquez sur <b>Upload</b>.</p>
+    </div>
+
+</body>
+</html>
