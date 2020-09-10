@@ -18,7 +18,7 @@ def process_request_image(img):
 def create_data_uri(img):
     _, img_ = cv2.imencode('.jpg', img)
     img_ = img_.tobytes()
-    img_ = b64encode(img_)
+    img_ = base64.b64encode(img_)
     img_ = img_.decode()
     mime = "image/jpeg"
     return "data:%s;base64,%s" % (mime, img_)

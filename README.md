@@ -1,9 +1,9 @@
 # wagon-data-cloudrun
 
-This repository contains a simple boilerplate to quickly build a
-falcon API ready to be deployed with Cloud Run. Now that Cloud Run instances
-can be configured with 4GB of RAM, it makes it a serious option for
-Deep Learning deployment. But before you proceed:
+This repository contains a simple example of a Flask app that serves a
+Deep Learning model (VGG16 in this case): https://image-classifier-sdauzsikga-ew.a.run.app/. 
+Now that Cloud Run instances can be configured with 4GB of RAM, it makes it a viable option for
+Deep Learning deployment, especially for Minimum Viable Products. But before you proceed:
 
 - Make sure you have a Google Cloud project set up.
 - Docker and gcloud CLI are installed on your local machine
