@@ -1,7 +1,7 @@
 # wagon-data-cloudrun
 
 This repository contains a simple example of a Flask app that serves a
-Deep Learning model (VGG16 in this case): https://image-classifier-sdauzsikga-ew.a.run.app/. 
+Deep Learning model (VGG16 in this case): https://image-classifier-sdauzsikga-ew.a.run.app/.
 Now that Cloud Run instances can be configured with 4GB of RAM, it makes it a viable option for
 Deep Learning deployment, especially for Minimum Viable Products. But before you proceed:
 
@@ -18,11 +18,14 @@ It allows other services such as Cloud Run to access these images in a convenien
 - Open a terminal and run the following commands:
 
 ```shell
+# Choose the Google account associated with your Google Cloud project
 gcloud auth login
+# Create JSON credentials
 gcloud auth configure-docker
+# Set the project name
+export PROJECT_ID = project_id # pick it up from your Google Cloud console
+gcloud config set project $PROJECT_ID
 ```
-
-- Choose the Google account associated with your Google Cloud project.
 
 You should be good to go.
 
@@ -46,10 +49,10 @@ def index():
 
         # A tiny bit of preprocessing
         img = process_request_image(img)
-        
+
         # Convert image to data URI so it can be displayed without being saved
         uri = create_data_uri(img)
-        
+
         # Convert to VGG16 input
         img = cv2.resize(img, (224, 224))
         img = np.reshape(img, [1, 224, 224, 3])
@@ -70,18 +73,27 @@ List all the dependencies needed to run your app.
 
 ## Build the Docker image
 
+
 ```shell
-docker build -t eu.gcr.io/[project_id]/[docker_image_name] .
-docker push eu.gcr.io/[project_id]/[docker_image_name]
+export DOCKER_IMAGE_NAME = docker_image_name # name it like you want e.g. image_classifier
+docker build -t eu.gcr.io/$PROJECT_ID/$DOCKER_IMAGE_NAME .
 ```
 
 Make sure your image runs:
 
 ```shell
-docker run -p 8080:8080 eu.gcr.io/[project_id]/[docker_image_name]
+docker run -p 8080:8080 eu.gcr.io/$PROJECT_ID/$DOCKER_IMAGE_NAME
+```
+Have a lookup at [http://localhost:8080](http://localhost:8080)
+
+Push the docker image on Google Cloud Registry:
+
+```shell
+docker push eu.gcr.io/$PROJECT_ID/$DOCKER_IMAGE_NAME
 ```
 
 ## Deploy on Cloud Run
 
-Go to your Google Cloud Platform project and open the service panel.
-Select the Cloud Run service and create a new service.
+```shell
+gcloud run deploy --image eu.gcr.io/$PROJECT_ID/$DOCKER_IMAGE_NAME --platform managed --region europe-west1
+```
