@@ -23,14 +23,20 @@ def create_data_uri(img):
     mime = "image/jpeg"
     return "data:%s;base64,%s" % (mime, img_)
 
-model = VGG16(weights='imagenet')
-
 app = Flask(__name__)
+
+model = None
 
 @app.route('/', methods = ['GET', 'POST'])
 def index():
 
     if request.method == 'GET':
+        
+        global model
+
+        if not model:
+            model = tf.keras.models.load_model('/model')
+        
         return render_template('index.html', prediction=None, img=None)
 
     if request.method == 'POST':
